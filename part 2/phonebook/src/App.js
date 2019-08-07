@@ -4,12 +4,15 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import PersonDetail from "./components/PersonDetail";
 import personService from "./services/persons";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState(" ");
   const [newNumber, setNewNumber] = useState(" ");
   const [searchName, setSearchName] = useState(" ");
+  const [sucessMessage, setSucessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     personService.getAll().then(initialPersons => {
@@ -17,6 +20,26 @@ const App = () => {
       setPersons(initialPersons);
     });
   }, []);
+
+  const sucessStyle = {
+    color: "green",
+    background: "lightgrey",
+    fontSize: "20",
+    borderStyle: "solid",
+    borderRadius: "5",
+    padding: "10",
+    marginBottom: "10"
+  };
+
+  const errorStyle = {
+    color: "red",
+    background: "lightgrey",
+    fontSize: "20",
+    borderStyle: "solid",
+    borderRadius: "5",
+    padding: "10",
+    marginBottom: "10"
+  };
 
   const handleNameChange = e => {
     setNewName(e.target.value);
@@ -41,15 +64,9 @@ const App = () => {
 
     console.log(duplicatePerson);
 
-    const { id } = duplicatePerson;
+    if (duplicatePerson) {
+      const { id } = duplicatePerson;
 
-    console.log(id);
-
-    if (duplicatePerson.length === 0) {
-      personService
-        .createPerson(personObj)
-        .then(returnedPerson => setPersons(persons.concat(returnedPerson)));
-    } else {
       const result = window.confirm(
         `${newName} is already added to phonebook, replace the old number with the new one?`
       );
@@ -57,14 +74,35 @@ const App = () => {
       result
         ? personService
             .updatePerson(id, personObj)
-            .then(returnedData =>
+            .then(returnedData => {
               setPersons(
                 persons.map(person =>
                   person.id !== id ? person : returnedData
                 )
-              )
-            )
+              );
+              setSucessMessage(`Updated contact ${personObj.name}`);
+              setTimeout(() => {
+                setSucessMessage(null);
+              }, 5000);
+            })
+            .catch(error => {
+              setErrorMessage(
+                `Person '${personObj.name}' was already removed from server`
+              );
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 5000);
+              setPersons(persons.filter(person => person.id !== id));
+            })
         : console.log("");
+    } else {
+      personService.createPerson(personObj).then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson));
+        setSucessMessage(`Added new contact ${personObj.name}`);
+        setTimeout(() => {
+          setSucessMessage(null);
+        }, 5000);
+      });
     }
 
     setNewName(" ");
@@ -78,10 +116,21 @@ const App = () => {
     console.log(result);
 
     result
-      ? personService.deletePerson(id).then(returnedData => {
-          console.log(returnedData);
-          setPersons(persons.filter(person => person.id !== id));
-        })
+      ? personService
+          .deletePerson(id)
+          .then(returnedData => {
+            console.log(returnedData);
+            setPersons(persons.filter(person => person.id !== id));
+          })
+          .catch(error => {
+            setErrorMessage(
+              `Person '${person.name}' was already removed from server`
+            );
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+            setPersons(persons.filter(person => person.id !== id));
+          })
       : console.log("");
   };
 
@@ -103,6 +152,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={sucessMessage} style={sucessStyle} />
+      <Notification message={errorMessage} style={errorStyle} />
 
       <Filter searchName={searchName} handleSearchChange={handleSearchChange} />
 
