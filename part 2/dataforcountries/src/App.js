@@ -21,16 +21,18 @@ const App = () => {
     country.name.toLowerCase().includes(searchCountries.toLowerCase().trim())
   );
 
-  const buttonClickHandle = e => {
-    console.log(e.target.parentNode.firstChild);
-    setSearchCounties(e.target.parentNode.firstChild.textContent);
+  const buttonClickHandle = id => {
+    console.log(id);
+    setSearchCounties(id);
   };
 
   const dispaly = () =>
     filteredCountries.map(country => (
       <div key={country.numericCode}>
-        <p>{country.name}</p>
-        <button onClick={buttonClickHandle}>show</button>
+        <p>
+          {country.name}{" "}
+          <button onClick={() => buttonClickHandle(country.name)}>show</button>
+        </p>
       </div>
     ));
 
