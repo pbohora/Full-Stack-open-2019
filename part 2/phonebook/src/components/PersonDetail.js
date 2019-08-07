@@ -1,14 +1,12 @@
 import React from "react";
 
-const PersonDetail = ({ filteredPerson }) => {
-  const display = () =>
-    filteredPerson.map(person => (
-      <p key={person.name}>
-        {person.name} {person.number}
-      </p>
-    ));
-
-  return <div>{display()}</div>;
+const PersonDetail = ({ person, handleDeletePerson }) => {
+  return (
+    <p>
+      {person.name} {person.number}
+      <button onClick={handleDeletePerson}>Delete</button>
+    </p>
+  );
 };
 
 export default PersonDetail;
