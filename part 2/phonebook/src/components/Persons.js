@@ -1,22 +1,9 @@
 import React from "react";
 
 import PersonDetail from "./PersonDetail";
-import personService from "../services/persons";
 
 const Persons = props => {
-  const { persons, searchName } = props;
-
-  const handleDeletePerson = id => {
-    console.log(id);
-    const result = window.confirm(`Do you want to delete ${id}`);
-    console.log(result);
-
-    result
-      ? personService.deletePerson(id).then(returnedData => {
-          console.log(returnedData);
-        })
-      : console.log("kiitos");
-  };
+  const { persons, searchName, handleDeletePerson } = props;
 
   const filteredPerson = persons.filter(
     person =>

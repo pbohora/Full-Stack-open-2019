@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import PersonDetail from "./components/PersonDetail";
-import personService from "./services/persons";
+
 import Notification from "./components/Notification";
+import Persons from "./components/Persons";
+
+import personService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -62,8 +64,6 @@ const App = () => {
         person.name.trim().toLowerCase() === personObj.name.trim().toLowerCase()
     );
 
-    console.log(duplicatePerson);
-
     if (duplicatePerson) {
       const { id } = duplicatePerson;
 
@@ -86,6 +86,7 @@ const App = () => {
               }, 5000);
             })
             .catch(error => {
+              console.log(error);
               setErrorMessage(
                 `Person '${personObj.name}' was already removed from server`
               );
@@ -123,6 +124,7 @@ const App = () => {
             setPersons(persons.filter(person => person.id !== id));
           })
           .catch(error => {
+            console.log(error);
             setErrorMessage(
               `Person '${person.name}' was already removed from server`
             );
@@ -133,21 +135,6 @@ const App = () => {
           })
       : console.log("");
   };
-
-  const filteredPerson = persons.filter(
-    person =>
-      searchName === "" ||
-      person.name.toLowerCase().includes(searchName.toLowerCase().trim())
-  );
-
-  const personDisplay = () =>
-    filteredPerson.map(person => (
-      <PersonDetail
-        key={person.id}
-        person={person}
-        handleDeletePerson={() => handleDeletePerson(person.id)}
-      />
-    ));
 
   return (
     <div>
@@ -167,7 +154,11 @@ const App = () => {
       />
       <h2>Numbers</h2>
 
-      {personDisplay()}
+      <Persons
+        persons={persons}
+        searchName={searchName}
+        handleDeletePerson={handleDeletePerson}
+      />
     </div>
   );
 };
