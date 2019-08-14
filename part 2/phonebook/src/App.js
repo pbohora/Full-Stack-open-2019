@@ -97,13 +97,21 @@ const App = () => {
             })
         : console.log("");
     } else {
-      personService.createPerson(personObj).then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson));
-        setSucessMessage(`Added new contact ${personObj.name}`);
-        setTimeout(() => {
-          setSucessMessage(null);
-        }, 5000);
-      });
+      personService
+        .createPerson(personObj)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
+          setSucessMessage(`Added new contact ${personObj.name}`);
+          setTimeout(() => {
+            setSucessMessage(null);
+          }, 5000);
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data.error);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
     }
 
     setNewName(" ");
