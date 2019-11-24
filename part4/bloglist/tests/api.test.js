@@ -51,11 +51,11 @@ test('new blog is created', async () => {
     .send(newBlog)
     .expect(201);
 
-  const response = await api.get('/api/blogs');
+  const blogAtEnd = await helper.blogInDb();
 
-  expect(response.body.length).toBe(helper.blogs.length + 1);
+  expect(blogAtEnd.length).toBe(helper.blogs.length + 1);
 
-  const author = response.body.map(blog => blog.author);
+  const author = blogAtEnd.map(blog => blog.author);
   expect(author).toContain('Annika lappa');
 });
 
@@ -73,7 +73,31 @@ test('title and url should be included', async () => {
   const newBlog = {
     author: 'Annika lappa'
   };
-  await api.post('/api/blogs').expect(400);
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400);
+});
+
+test('blog id deleted', async () => {
+  const blogsAtStart = await helper.blogInDb();
+  const blogToDelete = blogsAtStart[0];
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const blogsAtEnd = await helper.blogInDb();
+  expect(blogsAtEnd.length).toBe(blogsAtStart.length - 1);
+});
+
+test('blog likes is updated', async () => {
+  const blogs = await helper.blogInDb();
+  const blogToUpdate = blogs[0];
+  const blog = {
+    likes: 12
+  };
+
+  const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(blog);
+  expect(response.body.likes).toEqual(blog.likes);
 });
 
 afterAll(() => {

@@ -1,3 +1,5 @@
+const Blog = require('../models/blog');
+
 const blogs = [
   {
     title: 'Data visualization',
@@ -12,4 +14,9 @@ const blogs = [
     likes: 5
   }
 ];
-module.exports = { blogs };
+
+const blogInDb = async () => {
+  const blogs = await Blog.find({});
+  return blogs.map(blog => blog.toJSON());
+};
+module.exports = { blogs, blogInDb };
