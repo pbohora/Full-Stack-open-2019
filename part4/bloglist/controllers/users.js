@@ -16,6 +16,10 @@ usersRouter.post('/', async (request, response, next) => {
     const body = request.body;
 
     const saltRounds = 10;
+    const password = body.password;
+    if (password.length < 3) {
+      return response.status(400).json({ error: 'very short password' });
+    }
     const passwordHash = await bcrypt.hash(body.password, saltRounds);
 
     const user = new User({
