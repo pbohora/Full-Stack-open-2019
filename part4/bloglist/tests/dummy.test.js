@@ -1,11 +1,11 @@
-const { dummy, totalLikes, favoriteBlog } = require('../utils/list_helper');
+const { dummy, totalLikes, favoriteBlog } = require('../utils/list_helper')
 
 test('dummy returns one', () => {
-  const blogs = [];
+  const blogs = []
 
-  const result = dummy(blogs);
-  expect(result).toBe(1);
-});
+  const result = dummy(blogs)
+  expect(result).toBe(1)
+})
 
 describe('bloglist total likes', () => {
   const blogs = [
@@ -21,11 +21,11 @@ describe('bloglist total likes', () => {
       url: 'https://jsai.com',
       likes: 5
     }
-  ];
+  ]
 
   test('total likes in bloglist', () => {
-    expect(totalLikes(blogs)).toBe(6);
-  });
+    expect(totalLikes(blogs)).toBe(6)
+  })
 
   test('favorite blog', () => {
     expect(favoriteBlog(blogs)).toEqual({
@@ -33,6 +33,6 @@ describe('bloglist total likes', () => {
       author: 'vnn',
       url: 'https://jsai.com',
       likes: 5
-    });
-  });
-});
+    })
+  })
+})
