@@ -1,31 +1,31 @@
-const supertest = require('supertest');
-const mongoose = require('mongoose');
-const app = require('../app');
-const helper = require('../data/test_helper');
+const supertest = require('supertest')
+const mongoose = require('mongoose')
+const app = require('../app')
+const helper = require('../data/test_helper')
 
-const api = supertest(app);
+const api = supertest(app)
 
-const Blog = require('../models/blog');
+const Blog = require('../models/blog')
 
 beforeEach(async () => {
-  await Blog.deleteMany({});
-  let blogObject = helper.blogs.map(blog => new Blog(blog));
-  const promiseArrary = blogObject.map(blog => blog.save());
-  await Promise.all(promiseArrary);
-});
+  await Blog.deleteMany({})
+  let blogObject = helper.blogs.map(blog => new Blog(blog))
+  const promiseArrary = blogObject.map(blog => blog.save())
+  await Promise.all(promiseArrary)
+})
 
 test('blogs returned as json', async () => {
   await api
     .get('/api/blogs')
     .expect(200)
-    .expect('Content-Type', /application\/json/);
-});
+    .expect('Content-Type', /application\/json/)
+})
 
 test('return all blogs', async () => {
-  const response = await api.get('/api/blogs');
+  const response = await api.get('/api/blogs')
 
-  expect(response.body.length).toBe(helper.blogs.length);
-});
+  expect(response.body.length).toBe(helper.blogs.length)
+})
 
 test('id defined for blog post', async () => {
   const newBlog = {
@@ -33,73 +33,73 @@ test('id defined for blog post', async () => {
     author: 'Annika',
     url: 'https://algorithm.com',
     likes: 100
-  };
+  }
 
-  const response = await api.post('/api/blogs').send(newBlog);
-  expect(response.body.id).toBeDefined();
-});
+  const response = await api.post('/api/blogs').send(newBlog)
+  expect(response.body.id).toBeDefined()
+})
 
 test('new blog is created', async () => {
   const newBlog = {
     title: 'Javascript algorithm part 2',
     author: 'Annika lappa',
     url: 'https://algorithm.com'
-  };
+  }
 
   await api
     .post('/api/blogs')
     .send(newBlog)
-    .expect(201);
+    .expect(201)
 
-  const blogAtEnd = await helper.blogInDb();
+  const blogAtEnd = await helper.blogInDb()
 
-  expect(blogAtEnd.length).toBe(helper.blogs.length + 1);
+  expect(blogAtEnd.length).toBe(helper.blogs.length + 1)
 
-  const author = blogAtEnd.map(blog => blog.author);
-  expect(author).toContain('Annika lappa');
-});
+  const author = blogAtEnd.map(blog => blog.author)
+  expect(author).toContain('Annika lappa')
+})
 
 test('returned zero likes if no likes is provided in body', async () => {
   const newBlog = {
     title: 'Javascript algorithm part 2',
     author: 'Annika lappa',
     url: 'https://algorithm.com'
-  };
-  const response = await api.post('/api/blogs').send(newBlog);
-  expect(response.body.likes).toEqual(0);
-});
+  }
+  const response = await api.post('/api/blogs').send(newBlog)
+  expect(response.body.likes).toEqual(0)
+})
 
 test('title and url should be included', async () => {
   const newBlog = {
     author: 'Annika lappa'
-  };
+  }
   await api
     .post('/api/blogs')
     .send(newBlog)
-    .expect(400);
-});
+    .expect(400)
+})
 
 test('blog id deleted', async () => {
-  const blogsAtStart = await helper.blogInDb();
-  const blogToDelete = blogsAtStart[0];
+  const blogsAtStart = await helper.blogInDb()
+  const blogToDelete = blogsAtStart[0]
 
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 
-  const blogsAtEnd = await helper.blogInDb();
-  expect(blogsAtEnd.length).toBe(blogsAtStart.length - 1);
-});
+  const blogsAtEnd = await helper.blogInDb()
+  expect(blogsAtEnd.length).toBe(blogsAtStart.length - 1)
+})
 
 test('blog likes is updated', async () => {
-  const blogs = await helper.blogInDb();
-  const blogToUpdate = blogs[0];
+  const blogs = await helper.blogInDb()
+  const blogToUpdate = blogs[0]
   const blog = {
     likes: 12
-  };
+  }
 
-  const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(blog);
-  expect(response.body.likes).toEqual(blog.likes);
-});
+  const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(blog)
+  expect(response.body.likes).toEqual(blog.likes)
+})
 
 afterAll(() => {
-  mongoose.connection.close();
-});
+  mongoose.connection.close()
+})
